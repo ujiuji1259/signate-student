@@ -3,6 +3,8 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
 def train(dataloader, model, lr, epoch):
     classifier_params = ["classifier.weight", "classifier.bias"]
     params = model.state_dict()
@@ -15,9 +17,13 @@ def train(dataloader, model, lr, epoch):
 
     optimizer = optim.Adam(optimizer_params)
     loss = nn.NLLLoss()
+    model.to(device)
 
     for e in range(1, epoch+1):
         for x, y, mask in dataloader:
+            x = x.to(device)
+            y = y.to(device)
+            mask = mask.to(device)
             optimizer.zero_grad()
             output = model(x, labels=y, attention_mask=mask)
             loss = output[0]
@@ -25,10 +31,13 @@ def train(dataloader, model, lr, epoch):
             optimizer.step()
 
 def predict(dataloader, model):
+    results = []
     with torch.no_grad():
         for x, y, mask in dataloader:
             output = model(x, attention_mask=mask)[0]
-            preds = torch.max(output, 1)[1].detach().numpy()
+            preds = torch.max(output, 1)[1].detach().numpy().tolist()
+            results.extend(preds)
 
+    return results
 
 

@@ -16,6 +16,7 @@ from transformers import BertForSequenceClassification, BertTokenizer
 from data_util import BertDataaset, my_collate_fn
 from trainer import train, predict
 # Press the green button in the gutter to run the script.
+
 if __name__ == '__main__':
     train_x, train_y = [], []
     with open("data/train.csv", "r", encoding="utf-8") as f:
