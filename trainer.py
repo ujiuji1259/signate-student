@@ -1,4 +1,5 @@
 
+from sklearn.metrics import f1_score
 import torch
 import torch.optim as optim
 import torch.nn as nn
@@ -32,12 +33,13 @@ def train(dataloader, model, lr, epoch):
 
 def predict(dataloader, model):
     results = []
+    labels = []
     with torch.no_grad():
         for x, y, mask in dataloader:
             output = model(x, attention_mask=mask)[0]
             preds = torch.max(output, 1)[1].detach().numpy().tolist()
             results.extend(preds)
+            labels.extend(y.detach().numpy().tolist())
 
-    return results
-
+    return results, labels
 
